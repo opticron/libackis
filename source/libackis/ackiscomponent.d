@@ -14,7 +14,7 @@ version(D_Version2) {
 	import std.parallelism:TaskPool,task,taskPool;
 	import std.digest.md:md5Of,digestToString=toHexString;
 	void sum(ubyte[16]digest, string input) {
-		digest []= md5Of(input);
+		digest []= (md5Of(input))[];
 	}
 	import core.stdc.errno:errno,EINTR,EAGAIN;
 	int getErrno() {
