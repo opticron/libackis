@@ -12,9 +12,9 @@ version(D_Version2) {
 	}
 	import std.regex;
 	import std.parallelism:TaskPool,task,taskPool;
-	import std.digest.md:md5Of,digestToString=toHexString;
-	void sum(ubyte[16]digest, string input) {
-		digest []= (md5Of(input))[];
+	string md5StringOf(string input) {
+		import std.digest.md:md5Of,toHexString;
+		return toHexString(md5Of(input));
 	}
 	import core.stdc.errno:errno,EINTR,EAGAIN;
 	int getErrno() {
@@ -28,6 +28,11 @@ version(D_Version2) {
 	import tools.threadpool;
 	import tools.base;
 	import std.md5:sum,digestToString;
+	string md5StringOf(string input) {
+	        ubyte[16]digest;
+		sum(digest,input);
+		return digestToString(digest);
+	}
 }
 import object;
 import kxml.xml;
@@ -219,9 +224,7 @@ class AckisComponent {
 	}
 
 	private string genResponseID(string input) {
-	        ubyte[16]digest;
-		sum(digest,input);
-		return digestToString(digest);
+		return md5StringOf(input);
 	}
 
 
@@ -481,11 +484,8 @@ class AckisComponent {
 			if (num == "403") {
 				debug(libackis)writefln("Received a request for authentication!");
 				string tmp = username~packet.respid~password;
-				// do hash function
-				ubyte[16]md5;
-		        	sum(md5,tmp);
 				// that last one needs to be the hash of tmp
-				sendAuth(packet.respid,username,digestToString(md5));
+				sendAuth(packet.respid,username,md5StringOf(tmp));
 				return;
 			} else if (num == "200") {
 				if (!registered) {
