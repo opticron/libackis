@@ -14,7 +14,8 @@ version(D_Version2) {
 	import std.parallelism:TaskPool,task,taskPool;
 	string md5StringOf(string input) {
 		import std.digest.md:md5Of,toHexString;
-		return toHexString(md5Of(input));
+		ubyte[16]hash = md5Of(input);
+		return toHexString(hash).idup;
 	}
 	import core.stdc.errno:errno,EINTR,EAGAIN;
 	int getErrno() {
@@ -336,7 +337,7 @@ class AckisComponent {
 					buffer ~= buf[0 .. read];
 					// make sure we get ALL the data before attempting a parse
 					if (read == 1024) {
-						SocketSet single = new SocketSet(1);
+						SocketSet single = new SocketSet();
 						single.add(connection);
 						// using socket.select to figure out whether there is data available is really annoying
 						while (Socket.select(single,null,null,0) > 0) {
