@@ -85,6 +85,15 @@ class AckisComponent {
 		} else {
 			Threadpool threadpool;
 		}
+
+		static void callback_shim(void function(AckisComponent,string,string,string) callback,
+			AckisComponent ackis, string s1, string s2, string s3) {
+			try {
+				callback(ackis, s1, s2, s3);
+			} catch (Exception e) {
+				debug(libackis)writefln("Caught exception from callback: %s", e.msg);
+			}
+		}
 	}
 	this (string mname="default_name",string comptype = "module",string address = "127.0.0.1",ushort port = 16668,string user=null,string pass=null) {
 		// make sure components running the old syntax barf hard
@@ -529,9 +538,9 @@ class AckisComponent {
 				if (found) {
 					debug(libackis)writefln("Pushing execution into task for %s",regex);
 					version(D_Version2) {
-						taskPool.put(task(callbacks[regex], this, packet.respid.idup, packet.attributes["data"].idup, packet.attributes["type"].idup));
+						taskPool.put(task(&callback_shim, callbacks[regex], this, packet.respid.idup, packet.attributes["data"].idup, packet.attributes["type"].idup));
 					} else {
-						threadpool.future(callbacks[regex] /fix/ stuple(this, packet.respid.dup, packet.attributes["data"].dup, packet.attributes["type"].dup));
+						threadpool.future(&callback_shim /fix/ stuple(callbacks[regex], this, packet.respid.dup, packet.attributes["data"].dup, packet.attributes["type"].dup));
 					}
 					debug(libackis)writefln("Spawned task for %s",regex);
 					caughtcb = true;
@@ -573,9 +582,9 @@ class AckisComponent {
 					if (found) {
 						debug(libackis)writefln("Calling function for %s",regex);
 						version(D_Version2) {
-							taskPool.put(task(callbacks[regex], this, packet.respid.idup, packet.attributes["action"].idup, packet.attributes["type"].idup));
+							taskPool.put(task(&callback_shim, callbacks[regex], this, packet.respid.idup, packet.attributes["action"].idup, packet.attributes["type"].idup));
 						} else {
-							threadpool.future(callbacks[regex] /fix/ stuple(this, packet.respid.dup, packet.attributes["action"].dup, packet.attributes["type"].dup));
+							threadpool.future(&callback_shim /fix/ stuple(callbacks[regex], this, packet.respid.dup, packet.attributes["action"].dup, packet.attributes["type"].dup));
 						}
 						// if we matched, we're done since we only want to match once
 						return;
