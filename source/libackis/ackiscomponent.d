@@ -396,8 +396,11 @@ class AckisComponent {
 			// since it always comes back with a blank root node, we need to get the first child that's packet
 			foreach (child;xml.parseXPath("packet")) {
 				XmlPacket packet;
-				if (nodeToPacket(child,packet)) {
+				if (nodeToPacket(child,packet)) try {
 					handlePacket(packet);
+				} catch(Exception e) {
+					debug(libackis)writefln("Failed to parse packet: %s", child.toString());
+					debug(libackis)writefln("Got exception: %s", e.msg);
 				}
 				xml.removeChild(child);
 			}
@@ -537,10 +540,17 @@ class AckisComponent {
 
 				if (found) {
 					debug(libackis)writefln("Pushing execution into task for %s",regex);
+					string type = "";
 					version(D_Version2) {
-						taskPool.put(task(&callback_shim, callbacks[regex], this, packet.respid.idup, packet.attributes["data"].idup, packet.attributes["type"].idup));
+						if ("type" in packet.attributes) {
+							type = packet.attributes["type"].idup;
+						}
+						taskPool.put(task(&callback_shim, callbacks[regex], this, packet.respid.idup, packet.attributes["data"].idup, type));
 					} else {
-						threadpool.future(&callback_shim /fix/ stuple(callbacks[regex], this, packet.respid.dup, packet.attributes["data"].dup, packet.attributes["type"].dup));
+						if ("type" in packet.attributes) {
+							type = packet.attributes["type"].dup;
+						}
+						threadpool.future(&callback_shim /fix/ stuple(callbacks[regex], this, packet.respid.dup, packet.attributes["data"].dup, type));
 					}
 					debug(libackis)writefln("Spawned task for %s",regex);
 					caughtcb = true;
