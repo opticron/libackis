@@ -7,5 +7,5 @@
 	"authors": [
 		"Kinsey Moore"
 	],
-	"dependencies": {"kxml": {"version": "~master"}}
+	"dependencies": {"kxml": {"version": "~>1.0.0"}}
 }
