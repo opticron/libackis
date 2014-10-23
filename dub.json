@@ -1,0 +1,11 @@
+{
+	"name": "libackis",
+	"description": "A D1/D2/Phobos/Phobos2 compatible library for communicating with Ackis2.0 compatible message routers",
+	"homepage": "https://256.makerslocal.org/wiki/Ackis2.0",
+	"copyright": "Copyright 2013, Kinsey Moore",
+	"license": "BSL-1.0",
+	"authors": [
+		"Kinsey Moore"
+	],
+	"dependencies": {"kxml": {"version": "~master"}}
+}
