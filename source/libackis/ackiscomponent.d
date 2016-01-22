@@ -350,7 +350,7 @@ class AckisComponent {
 						SocketSet single = new SocketSet();
 						single.add(connection);
 						// using socket.select to figure out whether there is data available is really annoying
-						while (Socket.select(single,null,null,0) > 0) {
+						while (Socket.select(single,null,null) > 0) {
 							synchronized (connection) read = connection.receive(buf);
 							buffer ~= buf[0 .. read];
 							single.add(connection);
@@ -378,11 +378,7 @@ class AckisComponent {
 				return 1;
 			}
 		}
-		// no return here for D2, because it's apparently unreachable
-		// but D1 complains about it
-		version(D_Version2) {} else {
-			return 0;
-		}
+		return 0;
 	}
 	
 	
