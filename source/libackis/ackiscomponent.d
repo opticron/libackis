@@ -319,7 +319,7 @@ class AckisComponent {
 		for(int x = 0;x<100;x++) { // i didn't realize how ugly this could be
 			handleSocket();
 			// wait 10 seconds between connection attempts, will probably be longer considering time for overhead
-			Socket.select(null,null,null,dur!"secs"(10));
+			Socket.select(null,null,null,dur!"seconds"(10));
 		}
 		// die after 100 attempts
 		return 1;
