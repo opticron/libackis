@@ -371,14 +371,14 @@ class AckisComponent {
 					buffer = null;
 					// die
 					connection = null;
-					return 1;
+					break;
 				}
 			} else {
 				// if we hit this, it means that for some reason, we're not picking up the socket error and we need to just die
-				return 1;
+				break;
 			}
 		}
-		return 0;
+		return 1;
 	}
 	
 	
