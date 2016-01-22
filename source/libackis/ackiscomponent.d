@@ -21,6 +21,7 @@ version(D_Version2) {
 	int getErrno() {
 		return errno;
 	}
+        import core.time:dur;
 } else {
 	import std.thread: Thread;
 	import std.c.stdlib: getErrno;
@@ -221,7 +222,7 @@ class AckisComponent {
 				}
 			}
 			// yeah, shut up, i'm using this as microsleep (usleep)
-			Socket.select(null,null,null,10000);
+			Socket.select(null,null,null,dur!"msecs"(10));
 		}
 		debug(libackis){
 			if (x == timeout) {
@@ -278,7 +279,7 @@ class AckisComponent {
 			// make sure thread execution actually starts...i was having issues with this
 			// b/c the thread takes time to spool up for one reason or an other
 			while (!running){
-				Socket.select(null,null,null,1000);
+				Socket.select(null,null,null,dur!"msecs"(1));
 			}
 		}
 	}
@@ -318,7 +319,7 @@ class AckisComponent {
 		for(int x = 0;x<100;x++) { // i didn't realize how ugly this could be
 			handleSocket();
 			// wait 10 seconds between connection attempts, will probably be longer considering time for overhead
-			Socket.select(null,null,null,10000000);
+			Socket.select(null,null,null,dur!"secs"(10));
 		}
 		// die after 100 attempts
 		return 1;
